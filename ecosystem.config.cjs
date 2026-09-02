@@ -4,6 +4,7 @@ module.exports = {
       name: 'ligao-559-apartelle',
       script: './dist/server/entry.mjs',
       interpreter: 'node',
+      cwd: '/var/www/jpaworx.com/ligao-559-apartelle',
 
       // Environment
       env: {
