@@ -9,6 +9,9 @@ export default defineConfig({
   server: {
     port: 5990,
   },
+  security: {
+    checkOrigin: false,
+  },
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
