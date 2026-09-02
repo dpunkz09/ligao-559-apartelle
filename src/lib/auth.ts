@@ -51,7 +51,9 @@ export function isAuthenticated(cookies: AstroCookies): boolean {
 export function setSessionCookie(cookies: AstroCookies, token: string) {
   cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    // Set COOKIE_SECURE=true in your env only when serving over HTTPS.
+    // Leaving it unset (HTTP/local) allows the cookie to work without SSL.
+    secure: process.env.COOKIE_SECURE === 'true',
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7 days
