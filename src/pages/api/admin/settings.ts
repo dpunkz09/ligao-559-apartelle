@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthenticated } from '../../../lib/auth';
 import { getDb, setSetting } from '../../../lib/db';
+import { captureAdminEvent } from '../../../lib/posthog-server';
 
 const ALLOWED_KEYS = new Set([
   'site_title', 'site_description',
@@ -67,6 +68,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       setSetting(db, key, value.slice(0, maxLen));
     }
 
+    await captureAdminEvent(cookies, 'site_settings_saved', {
+      setting_count: Object.keys(body).filter((key) => ALLOWED_KEYS.has(key)).length,
+    });
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

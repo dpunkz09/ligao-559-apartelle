@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { loginUser, setSessionCookie } from '../../../lib/auth';
+import { getDb } from '../../../lib/db';
 
 // In-memory rate limiter: max 5 attempts per IP per 15 minutes
 const WINDOW_MS = 15 * 60 * 1000;
@@ -53,7 +54,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // Clear the counter on successful login
   clearAttempts(ip);
   setSessionCookie(cookies, token);
-  return new Response(JSON.stringify({ ok: true }), {
+  const user = getDb()
+    .prepare('SELECT id FROM admin_users WHERE username = ?')
+    .get(username) as { id: number } | undefined;
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Admin account not found.' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response(JSON.stringify({ ok: true, userId: user.id }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });

@@ -1,4 +1,5 @@
 ---
+import PostHog from '../components/posthog.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -64,6 +65,7 @@ const fontsUrl =
     <noscript><link rel="stylesheet" href={fontsUrl} /></noscript>
 
     <title>{title}</title>
+    <PostHog />
 
     <!-- Dynamic brand color injected from DB -->
     <style define:vars={{ brand: brandColor, brandDark: brandColorDark }}>

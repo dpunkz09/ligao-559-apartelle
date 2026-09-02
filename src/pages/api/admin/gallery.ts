@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthenticated } from '../../../lib/auth';
 import { getDb } from '../../../lib/db';
+import { captureAdminEvent } from '../../../lib/posthog-server';
 import { writeFileSync, mkdirSync, unlinkSync } from 'fs';
 import { resolve, extname } from 'path';
 import { randomBytes } from 'crypto';
@@ -67,6 +68,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const result = db.prepare(
       'INSERT INTO gallery (src, alt, caption, is_featured, sort_order) VALUES (?, ?, ?, ?, ?)'
     ).run(`/images/${filename}`, alt, caption, isFeatured, maxOrder + 1);
+    await captureAdminEvent(cookies, 'gallery_photo_uploaded', { is_featured: isFeatured === 1 });
 
     return new Response(JSON.stringify({ ok: true, id: result.lastInsertRowid, src: `/images/${filename}` }), {
       status: 201,
@@ -115,6 +117,7 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
   try {
     vals.push(body.id);
     getDb().prepare(`UPDATE gallery SET ${fields.join(', ')} WHERE id = ?`).run(...vals);
+    if (body.is_featured === 1) await captureAdminEvent(cookies, 'gallery_photo_featured');
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('DB error on gallery PATCH:', err);
@@ -153,6 +156,7 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
     }
 
     db.prepare('DELETE FROM gallery WHERE id = ?').run(body.id);
+    await captureAdminEvent(cookies, 'gallery_photo_deleted');
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('DB error on gallery DELETE:', err);

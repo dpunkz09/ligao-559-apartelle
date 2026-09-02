@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthenticated, getSessionUser } from '../../../lib/auth';
 import { getDb } from '../../../lib/db';
+import { captureAdminEvent } from '../../../lib/posthog-server';
 import { compareSync, hashSync } from 'bcryptjs';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -39,6 +40,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   db.prepare('UPDATE admin_users SET password = ? WHERE username = ?').run(hashSync(body.new_password, 10), username);
+  await captureAdminEvent(cookies, 'password_changed');
 
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,

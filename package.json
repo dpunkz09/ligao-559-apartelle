@@ -17,6 +17,8 @@
     "astro": "^7.2.10",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
+    "posthog-js": "^1.425.1",
+    "posthog-node": "^5.51.6",
     "tailwindcss": "^4.3.3"
   },
   "allowScripts": {

@@ -1,4 +1,6 @@
 ---
+import PostHog from '../components/posthog.astro';
+import { getSessionUserId } from '../lib/auth';
 import '../styles/global.css';
 
 interface Props {
@@ -7,6 +9,7 @@ interface Props {
 }
 
 const { title = 'Admin', active = '' } = Astro.props;
+const adminUserId = getSessionUserId(Astro.cookies);
 
 const nav = [
   { href: '/admin', label: 'Dashboard', icon: 'home' },
@@ -38,6 +41,12 @@ const fontsUrl =
     <noscript><link rel="stylesheet" href={fontsUrl} /></noscript>
 
     <title>{title} · 559 Admin</title>
+    <PostHog />
+    {adminUserId !== null && (
+      <script is:inline define:vars={{ adminUserId }}>
+        window.posthog?.identify(`admin:${adminUserId}`);
+      </script>
+    )}
     <style>
       :root { --brand: #e91e8c; --brand-dark: #c4156f; }
       .ms { font-family: 'Material Symbols Rounded'; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
@@ -141,6 +150,7 @@ const fontsUrl =
       // Handle logout via fetch to avoid full page reload issues
       document.getElementById('logout-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        window.posthog?.reset();
         await fetch('/api/admin/logout', { method: 'POST' });
         window.location.href = '/admin/login';
       });

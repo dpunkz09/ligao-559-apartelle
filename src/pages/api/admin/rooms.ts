@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthenticated } from '../../../lib/auth';
 import { getDb } from '../../../lib/db';
+import { captureAdminEvent } from '../../../lib/posthog-server';
 import { writeFileSync, mkdirSync } from 'fs';
 import { resolve, extname } from 'path';
 import { randomBytes } from 'crypto';
@@ -52,6 +53,9 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
       for (const [i, feat] of body.features.entries()) ins.run(body.id, String(feat).slice(0, 200), i);
     }
 
+    await captureAdminEvent(cookies, 'room_updated', {
+      feature_count: Array.isArray(body.features) ? body.features.length : undefined,
+    });
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('DB error on room PUT:', err);
@@ -102,6 +106,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (roomId) {
       getDb().prepare('UPDATE rooms SET image = ? WHERE id = ?').run(src, roomId);
     }
+    await captureAdminEvent(cookies, 'room_image_uploaded');
     return new Response(JSON.stringify({ ok: true, src }), { status: 201, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('DB error on room image update:', err);

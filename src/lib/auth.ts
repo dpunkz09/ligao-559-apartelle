@@ -44,6 +44,16 @@ export function getSessionUser(cookies: AstroCookies): string | null {
   return verify(token);
 }
 
+export function getSessionUserId(cookies: AstroCookies): number | null {
+  const username = getSessionUser(cookies);
+  if (!username) return null;
+
+  const user = getDb()
+    .prepare('SELECT id FROM admin_users WHERE username = ?')
+    .get(username) as { id: number } | undefined;
+  return user?.id ?? null;
+}
+
 export function isAuthenticated(cookies: AstroCookies): boolean {
   return getSessionUser(cookies) !== null;
 }

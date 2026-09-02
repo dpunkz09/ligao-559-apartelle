@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { isAuthenticated } from '../../../lib/auth';
 import { getDb } from '../../../lib/db';
+import { captureAdminEvent } from '../../../lib/posthog-server';
 
 // PUT: update single amenity
 export const PUT: APIRoute = async ({ request, cookies }) => {
@@ -27,6 +28,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
         description = COALESCE(?, description)
       WHERE id = ?
     `).run(body.icon ?? null, body.title ?? null, body.description ?? null, body.id);
+    await captureAdminEvent(cookies, 'amenity_updated');
 
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
@@ -57,6 +59,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       String(body.description ?? '').slice(0, 300),
       maxOrder + 1
     );
+    await captureAdminEvent(cookies, 'amenity_created');
 
     return new Response(JSON.stringify({ ok: true, id: result.lastInsertRowid }), {
       status: 201,
@@ -87,6 +90,7 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
 
   try {
     getDb().prepare('DELETE FROM amenities WHERE id = ?').run(body.id);
+    await captureAdminEvent(cookies, 'amenity_deleted');
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('DB error on amenity DELETE:', err);
