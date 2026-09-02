@@ -10,13 +10,13 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         HOST: '0.0.0.0',
-        PORT: 5590,
+        PORT: 5990,
         // Set COOKIE_SECURE=true only when serving over HTTPS (e.g. behind Nginx with SSL).
         // Leave as 'false' when serving over plain HTTP — otherwise the login cookie
         // will be silently dropped by the browser and you won't be able to log in.
-        COOKIE_SECURE: 'false',
+        COOKIE_SECURE: 'true',
         // Uncomment and set a strong random secret before deploying:
-        // SESSION_SECRET: 'your-strong-random-secret-here',
+        SESSION_SECRET: 'f3g4cvty35b6uj6tw3cw6ahWEg5etbu',
       },
 
       // Restart policy
