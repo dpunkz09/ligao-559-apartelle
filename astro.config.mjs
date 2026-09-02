@@ -7,7 +7,7 @@ export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   server: {
-    port: 559,
+    port: 5590,
   },
   vite: {
     plugins: [tailwindcss()],

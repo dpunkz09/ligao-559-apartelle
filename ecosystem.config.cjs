@@ -8,8 +8,8 @@ module.exports = {
       // Environment
       env: {
         NODE_ENV: 'production',
-        HOST: '0.0.0.0',
-        PORT: 559,
+        HOST: '127.0.0.1',
+        PORT: 5590,
         // Set a strong random secret before deploying:
         // SESSION_SECRET: 'your-strong-random-secret-here',
       },
