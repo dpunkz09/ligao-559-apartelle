@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Allow: /
+
+# Sitemap (update domain before going live)
+# Sitemap: https://yourdomain.com/sitemap-index.xml

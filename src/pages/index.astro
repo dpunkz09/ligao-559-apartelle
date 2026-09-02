@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Rooms from '../components/Rooms.astro';
+import Amenities from '../components/Amenities.astro';
+import Gallery from '../components/Gallery.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import { getDb, getSettings, getRooms, getAmenities, getGallery } from '../lib/db';
+
+const db = getDb();
+const s = getSettings(db);
+const rooms = getRooms(db);
+const amenities = getAmenities(db);
+const photos = getGallery(db);
+
+const siteOrigin = Astro.site ?? Astro.url.origin;
+
+// LocalBusiness structured data for Google search / Knowledge Panel
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LodgingBusiness',
+  name: '559 Apartelle',
+  description: s.site_description,
+  telephone: s.phone,
+  url: siteOrigin,
+  image: `${siteOrigin}/images/entrance.jpg`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Brgy. Tomolin',
+    addressLocality: 'Ligao City',
+    addressRegion: 'Albay',
+    addressCountry: 'PH',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 13.2178,
+    longitude: 123.4844,
+  },
+  openingHours: 'Mo-Su 00:00-23:59',
+  priceRange: '₱',
+  sameAs: [s.facebook_url].filter(Boolean),
+};
+---
+
+<BaseLayout
+  title={s.site_title}
+  description={s.site_description}
+  brandColor={s.brand_color}
+  brandColorDark={s.brand_color_dark}
+  ogImage="/images/entrance.jpg"
+>
+  <!-- LocalBusiness JSON-LD -->
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <Navbar phone={s.phone} />
+  <main>
+    <Hero
+      badge={s.hero_badge}
+      headline={s.hero_headline}
+      subheadline={s.hero_subheadline}
+      bgImage={s.hero_bg_image}
+      phone={s.phone}
+    />
+    <Rooms
+      rooms={rooms}
+      heading={s.rooms_heading}
+      subtext={s.rooms_subtext}
+      phone={s.phone}
+    />
+    <Amenities
+      amenities={amenities}
+      heading={s.amenities_heading}
+      subtext={s.amenities_subtext}
+      ctaHeading={s.cta_heading}
+      ctaSubtext={s.cta_subtext}
+      phone={s.phone}
+      facebookUrl={s.facebook_url}
+    />
+    <Gallery photos={photos} facebookUrl={s.facebook_url} />
+    <Contact
+      phone={s.phone}
+      address={s.address}
+      facebookUrl={s.facebook_url}
+      mapsUrl={s.maps_url}
+      mapsEmbedUrl={s.maps_embed_url}
+      openHours={s.open_hours}
+    />
+  </main>
+  <Footer
+    phone={s.phone}
+    address={s.address}
+    facebookUrl={s.facebook_url}
+    mapsUrl={s.maps_url}
+  />
+
+  <!-- Floating call button (mobile only) -->
+  <a
+    href={`tel:+63${s.phone.replace(/^0/, '').replace(/-/g, '')}`}
+    class="fixed right-6 z-50 md:hidden w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all hover:scale-110"
+    style="background:var(--brand); bottom: max(1.5rem, env(safe-area-inset-bottom))"
+    aria-label="Call 559 Apartelle"
+  >
+    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+    </svg>
+  </a>
+</BaseLayout>

@@ -1,0 +1,168 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../lib/auth';
+import { getDb, getRooms } from '../../lib/db';
+
+if (!isAuthenticated(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const rooms = getRooms(getDb());
+---
+
+<AdminLayout title="Rooms" active="Rooms">
+  <div class="mb-8">
+    <h1 class="text-2xl font-black text-gray-900">Rooms</h1>
+    <p class="text-gray-500 text-sm mt-1">Edit room names, descriptions, features, and images.</p>
+  </div>
+
+  <div class="space-y-6">
+    {rooms.map(room => (
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" data-room-id={room.id}>
+        <div class="flex flex-wrap items-center gap-4 p-5 border-b border-gray-100">
+          <!-- Image thumbnail + upload -->
+          <div class="relative flex-shrink-0">
+            <img
+              src={room.image}
+              alt={room.name}
+              class="room-img w-20 h-16 rounded-xl object-cover border border-gray-100"
+              onerror={`this.onerror=null;this.src=this.src.replace('.jpg','.svg');`}
+            />
+            <button
+              class="img-upload-btn absolute -bottom-1 -right-1 w-6 h-6 rounded-full text-white flex items-center justify-center shadow text-xs"
+              style="background:var(--brand)"
+              data-id={room.id}
+              title="Change image"
+            >
+              ✎
+            </button>
+            <input type="file" class="img-file-input hidden" accept="image/*" data-id={room.id} />
+          </div>
+          <div class="flex-1 min-w-0">
+            <input
+              type="text"
+              class="room-name font-bold text-gray-900 text-base bg-transparent border-0 border-b-2 border-transparent focus:border-b-2 w-full outline-none transition-colors pb-0.5"
+              style="font-family:inherit"
+              value={room.name}
+              data-id={room.id}
+              data-field="name"
+              onfocus="this.style.borderBottomColor='var(--brand)'"
+              onblur="this.style.borderBottomColor='transparent'"
+            />
+            <input
+              type="text"
+              class="room-badge text-xs mt-1 bg-transparent border-0 border-b border-transparent focus:border-b w-full outline-none transition-colors text-gray-400"
+              style="font-family:inherit"
+              value={room.badge}
+              placeholder="Badge (e.g. Most Popular)"
+              data-id={room.id}
+              data-field="badge"
+              onfocus="this.style.borderBottomColor='var(--brand)'"
+              onblur="this.style.borderBottomColor='transparent'"
+            />
+          </div>
+          <button
+            class="save-room-btn btn-primary flex-shrink-0 text-sm"
+            data-id={room.id}
+          >
+            Save
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <label class="block">
+            <span class="field-label">Description</span>
+            <textarea
+              class="room-description field-input"
+              rows="2"
+              data-id={room.id}
+              data-field="description"
+            >{room.description}</textarea>
+          </label>
+
+          <div>
+            <span class="field-label">Features (one per line)</span>
+            <textarea
+              class="room-features field-input"
+              rows="5"
+              data-id={room.id}
+              placeholder="One feature per line"
+            >{(room.features ?? []).join('\n')}</textarea>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 right-6 bg-green-600 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl z-50">
+    ✓ Room saved
+  </div>
+</AdminLayout>
+
+<style>
+  .field-label { font-size: 0.8125rem; font-weight: 600; color: #4b5563; display: block; margin-bottom: 0.375rem; }
+  .field-input { width: 100%; padding: 0.625rem 0.875rem; border: 1.5px solid #e5e7eb; border-radius: 0.625rem; font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.15s; background: #f9fafb; color: #111827; display: block; resize: vertical; }
+  .field-input:focus { border-color: var(--brand); background: white; }
+  .btn-primary { background: var(--brand); color: white; font-weight: 700; border: none; border-radius: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; padding: 0.625rem 1.25rem; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--brand-dark); }
+</style>
+
+<script>
+  function showToast(msg = '✓ Saved') {
+    const t = document.getElementById('toast')!;
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 2500);
+  }
+
+  // Save room
+  document.querySelectorAll<HTMLButtonElement>('.save-room-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      const card = btn.closest('[data-room-id]')!;
+
+      const name = (card.querySelector('.room-name') as HTMLInputElement).value;
+      const badge = (card.querySelector('.room-badge') as HTMLInputElement).value;
+      const description = (card.querySelector('.room-description') as HTMLTextAreaElement).value;
+      const featuresRaw = (card.querySelector('.room-features') as HTMLTextAreaElement).value;
+      const features = featuresRaw.split('\n').map(f => f.trim()).filter(Boolean);
+
+      btn.textContent = '…';
+      btn.disabled = true;
+
+      const res = await fetch('/api/admin/rooms', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, badge, description, features }),
+      });
+
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      if (res.ok) showToast('✓ Room saved');
+    });
+  });
+
+  // Image upload
+  document.querySelectorAll<HTMLButtonElement>('.img-upload-btn').forEach(btn => {
+    const id = btn.dataset.id!;
+    const fileInput = btn.parentElement!.querySelector(`.img-file-input[data-id="${id}"]`) as HTMLInputElement;
+    btn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      btn.textContent = '…';
+
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('room_id', id);
+
+      const res = await fetch('/api/admin/rooms', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.src) {
+        const img = btn.parentElement!.querySelector('.room-img') as HTMLImageElement;
+        img.src = data.src;
+        showToast('✓ Image updated');
+      }
+      btn.textContent = '✎';
+    });
+  });
+</script>

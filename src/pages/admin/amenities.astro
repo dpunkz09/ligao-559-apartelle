@@ -1,0 +1,181 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../lib/auth';
+import { getDb, getAmenities } from '../../lib/db';
+
+if (!isAuthenticated(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const amenities = getAmenities(getDb());
+---
+
+<AdminLayout title="Amenities" active="Amenities">
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-black text-gray-900">Amenities</h1>
+      <p class="text-gray-500 text-sm mt-1">Add, edit, or remove amenity tiles shown on the homepage.</p>
+    </div>
+    <button id="add-amenity-btn" class="btn-primary flex items-center gap-2 self-start">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add Amenity
+    </button>
+  </div>
+
+  <div id="amenities-list" class="grid sm:grid-cols-2 gap-4">
+    {amenities.map(am => (
+      <div class="amenity-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 items-start" data-id={am.id}>
+        <!-- Icon input: full-width on mobile, fixed-width on sm+ -->
+        <div class="flex sm:flex-col items-center gap-3 sm:gap-0 w-full sm:w-auto sm:flex-shrink-0">
+          <input
+            type="text"
+            class="am-icon field-input text-center font-mono text-sm"
+            value={am.icon}
+            title="Material Symbols icon name (e.g. directions_car)"
+            placeholder="icon_name"
+            style="max-width:9rem"
+          />
+          <span class="ms flex-shrink-0 sm:block sm:text-center sm:mt-1" style="font-size:1.5rem;color:var(--brand)">{am.icon}</span>
+        </div>
+        <div class="flex-1 min-w-0 space-y-2 w-full">
+          <input
+            type="text"
+            class="am-title field-input font-semibold"
+            value={am.title}
+            placeholder="Title"
+          />
+          <textarea
+            class="am-description field-input"
+            rows="2"
+            placeholder="Description"
+          >{am.description}</textarea>
+          <!-- Buttons inline below inputs on mobile -->
+          <div class="flex gap-2 sm:hidden">
+            <button class="save-am-btn btn-primary text-xs px-3 py-1.5 flex-1" data-id={am.id}>Save</button>
+            <button class="delete-am-btn btn-danger text-xs px-3 py-1.5 flex-1" data-id={am.id}>Delete</button>
+          </div>
+        </div>
+        <!-- Buttons stacked on the right on sm+ -->
+        <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+          <button class="save-am-btn btn-primary text-xs px-3 py-1.5" data-id={am.id}>Save</button>
+          <button class="delete-am-btn btn-danger text-xs px-3 py-1.5" data-id={am.id}>Delete</button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Add new form (hidden) -->
+  <div id="add-panel" class="hidden mt-6 bg-white rounded-2xl p-6 shadow-sm border-2 border-dashed" style="border-color:var(--brand)">
+    <h3 class="font-bold text-gray-900 mb-4">New Amenity</h3>
+    <div class="flex gap-4 items-start">
+      <input type="text" id="new-icon" placeholder="auto_awesome" class="field-input font-mono text-sm" style="max-width:9rem" />
+      <div class="flex-1 space-y-3">
+        <input type="text" id="new-title" placeholder="Amenity name" class="field-input" />
+        <textarea id="new-desc" placeholder="Short description" rows="2" class="field-input"></textarea>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-4">
+      <button id="add-submit" class="btn-primary">Add Amenity</button>
+      <button id="add-cancel" class="btn-secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 right-6 bg-green-600 text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-xl z-50">
+    ✓ Saved
+  </div>
+</AdminLayout>
+
+<style>
+  .field-label { font-size: 0.8125rem; font-weight: 600; color: #4b5563; display: block; margin-bottom: 0.375rem; }
+  .field-input { width: 100%; padding: 0.625rem 0.875rem; border: 1.5px solid #e5e7eb; border-radius: 0.625rem; font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.15s; background: #f9fafb; color: #111827; display: block; }
+  .field-input:focus { border-color: var(--brand); background: white; }
+  textarea.field-input { resize: vertical; }
+  .btn-primary { background: var(--brand); color: white; font-weight: 700; border: none; border-radius: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; padding: 0.625rem 1.25rem; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-secondary { background: #f3f4f6; color: #374151; font-weight: 600; border: 1.5px solid #e5e7eb; border-radius: 0.625rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; padding: 0.625rem 1rem; transition: all 0.15s; }
+  .btn-secondary:hover { border-color: var(--brand); color: var(--brand); }
+  .btn-danger { background: #fef2f2; color: #dc2626; font-weight: 600; border: 1.5px solid #fecaca; border-radius: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.875rem; padding: 0.625rem 1rem; transition: all 0.15s; }
+  .btn-danger:hover { background: #fee2e2; }
+</style>
+
+<script>
+  function showToast(msg = '✓ Saved') {
+    const t = document.getElementById('toast')!;
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 2500);
+  }
+
+  // Save amenity
+  document.querySelectorAll<HTMLButtonElement>('.save-am-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      const card = btn.closest('.amenity-card')!;
+      const icon = (card.querySelector('.am-icon') as HTMLInputElement).value;
+      const title = (card.querySelector('.am-title') as HTMLInputElement).value;
+      const description = (card.querySelector('.am-description') as HTMLTextAreaElement).value;
+
+      btn.textContent = '…';
+      btn.disabled = true;
+      const res = await fetch('/api/admin/amenities', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, icon, title, description }),
+      });
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      if (res.ok) showToast('✓ Amenity saved');
+    });
+  });
+
+  // Delete amenity
+  document.querySelectorAll<HTMLButtonElement>('.delete-am-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this amenity?')) return;
+      const id = Number(btn.dataset.id);
+      const res = await fetch('/api/admin/amenities', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        btn.closest('.amenity-card')?.remove();
+        showToast('✓ Deleted');
+      }
+    });
+  });
+
+  // Add new
+  const addBtn = document.getElementById('add-amenity-btn')!;
+  const addPanel = document.getElementById('add-panel')!;
+  const addCancel = document.getElementById('add-cancel')!;
+  const addSubmit = document.getElementById('add-submit') as HTMLButtonElement;
+  const list = document.getElementById('amenities-list')!;
+
+  addBtn.addEventListener('click', () => addPanel.classList.toggle('hidden'));
+  addCancel.addEventListener('click', () => addPanel.classList.add('hidden'));
+
+  addSubmit.addEventListener('click', async () => {
+    const icon = (document.getElementById('new-icon') as HTMLInputElement).value || 'auto_awesome';
+    const title = (document.getElementById('new-title') as HTMLInputElement).value;
+    const description = (document.getElementById('new-desc') as HTMLTextAreaElement).value;
+
+    if (!title) { alert('Please enter a title.'); return; }
+
+    addSubmit.textContent = '…';
+    addSubmit.disabled = true;
+
+    const res = await fetch('/api/admin/amenities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ icon, title, description }),
+    });
+
+    if (res.ok) {
+      window.location.reload();
+    } else {
+      addSubmit.textContent = 'Add Amenity';
+      addSubmit.disabled = false;
+    }
+  });
+</script>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f0fdf4"/>
+  <!-- Floor -->
+  <rect x="0" y="420" width="800" height="180" fill="#92400e" opacity="0.4"/>
+  <!-- Wall -->
+  <rect x="0" y="0" width="800" height="430" fill="#f5f5f0"/>
+  <!-- Bed 1 -->
+  <rect x="60" y="300" width="200" height="120" rx="8" fill="#8b5cf6" opacity="0.3"/>
+  <rect x="60" y="260" width="200" height="55" rx="6" fill="#e5e7eb"/>
+  <rect x="70" y="265" width="80" height="40" rx="4" fill="#fecdd3"/>
+  <rect x="170" y="265" width="80" height="40" rx="4" fill="#fecdd3"/>
+  <!-- Bed 2 -->
+  <rect x="300" y="300" width="200" height="120" rx="8" fill="#8b5cf6" opacity="0.3"/>
+  <rect x="300" y="260" width="200" height="55" rx="6" fill="#e5e7eb"/>
+  <rect x="310" y="265" width="80" height="40" rx="4" fill="#fecdd3"/>
+  <rect x="410" y="265" width="80" height="40" rx="4" fill="#fecdd3"/>
+  <!-- Fan -->
+  <circle cx="400" cy="60" r="40" fill="none" stroke="#9ca3af" stroke-width="3"/>
+  <text x="400" y="65" text-anchor="middle" font-family="Arial" font-size="12" fill="#6b7280">fan</text>
+  <text x="400" y="550" text-anchor="middle" font-family="Arial" font-size="18" fill="#6b7280">Comfortable Room with Beds</text>
+</svg>

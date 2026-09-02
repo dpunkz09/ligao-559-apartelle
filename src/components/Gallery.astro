@@ -1,0 +1,76 @@
+---
+import type { GalleryPhoto } from '../lib/db';
+
+interface Props {
+  photos: GalleryPhoto[];
+  facebookUrl?: string;
+}
+
+const {
+  photos,
+  facebookUrl = 'https://www.facebook.com/profile.php?id=100057213410203',
+} = Astro.props;
+
+const featured = photos.find(p => p.is_featured) ?? photos[0];
+const rest = photos.filter(p => p.id !== featured?.id);
+---
+
+<section id="gallery" class="py-20 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <span class="font-semibold text-sm uppercase tracking-widest" style="color:var(--brand)">Photo Gallery</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">See It for Yourself</h2>
+      <p class="text-gray-500 mt-3 max-w-xl mx-auto">A glimpse of what's waiting for you at 559 Apartelle.</p>
+      <div class="w-16 h-1 rounded-full mx-auto mt-5" style="background:var(--brand)"></div>
+    </div>
+
+    {photos.length > 0 ? (
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Featured -->
+        {featured && (
+          <div class="col-span-2 row-span-2 relative group overflow-hidden rounded-3xl shadow-md">
+            <img
+              src={featured.src}
+              alt={featured.alt}
+              class="w-full h-full object-cover min-h-64 group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              width="800"
+              height="600"
+              onerror={`this.onerror=null;this.src=this.src.replace('.jpg','.svg');`}
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
+              <p class="text-white font-semibold text-sm">{featured.caption}</p>
+            </div>
+          </div>
+        )}
+        {rest.map(photo => (
+          <div class="relative group overflow-hidden rounded-2xl shadow-md">
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              class="w-full h-48 md:h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              width="400"
+              height="192"
+              onerror={`this.onerror=null;this.src=this.src.replace('.jpg','.svg');`}
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+              <p class="text-white font-semibold text-xs">{photo.caption}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-center text-gray-400">No photos yet.</p>
+    )}
+
+    <div class="text-center mt-8">
+      <a href={facebookUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 font-semibold text-sm transition-colors" style="color:var(--brand)">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+        View more photos on our Facebook page →
+      </a>
+    </div>
+  </div>
+</section>

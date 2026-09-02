@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#fde68a"/>
+  <rect x="0" y="0" width="800" height="300" fill="#7dd3fc"/>
+  <!-- Building -->
+  <rect x="50" y="250" width="700" height="280" fill="#f59e0b"/>
+  <!-- Garage doors -->
+  <rect x="80" y="300" width="120" height="180" rx="4" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+  <rect x="230" y="300" width="120" height="180" rx="4" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+  <rect x="380" y="300" width="120" height="180" rx="4" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+  <rect x="530" y="300" width="120" height="180" rx="4" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+  <!-- Pillars -->
+  <rect x="200" y="250" width="20" height="280" fill="#d97706"/>
+  <rect x="350" y="250" width="20" height="280" fill="#d97706"/>
+  <rect x="500" y="250" width="20" height="280" fill="#d97706"/>
+  <!-- Ground -->
+  <rect x="0" y="510" width="800" height="90" fill="#d1d5db"/>
+  <text x="400" y="560" text-anchor="middle" font-family="Arial" font-size="18" fill="#6b7280">Private Covered Garages</text>
+</svg>

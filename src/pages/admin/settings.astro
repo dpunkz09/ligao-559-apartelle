@@ -1,0 +1,269 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { isAuthenticated } from '../../lib/auth';
+import { getDb, getSettings } from '../../lib/db';
+
+if (!isAuthenticated(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const db = getDb();
+const s = getSettings(db);
+---
+
+<AdminLayout title="Settings" active="Settings">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-black text-gray-900">Settings</h1>
+      <p class="text-gray-500 text-sm mt-1">Edit site content, contact info, theme color, and hero background.</p>
+    </div>
+    <div id="save-status" class="hidden text-sm font-semibold text-green-600 bg-green-50 border border-green-200 px-4 py-2 rounded-full">✓ Saved</div>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+    <h2 class="font-bold text-gray-900 mb-5 flex items-center gap-2"><span class="ms" style="color:var(--brand)">home</span> Hero Section</h2>
+    <div class="space-y-4">
+      <label class="block">
+        <span class="field-label">Badge Text</span>
+        <input type="text" data-key="hero_badge" value={s.hero_badge} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Headline</span>
+        <input type="text" data-key="hero_headline" value={s.hero_headline} class="field-input" />
+        <p class="text-xs text-gray-400 mt-1">Last word is highlighted in brand color.</p>
+      </label>
+      <label class="block">
+        <span class="field-label">Subheadline</span>
+        <textarea data-key="hero_subheadline" rows="3" class="field-input">{s.hero_subheadline}</textarea>
+      </label>
+      <!-- Hero BG Image upload -->
+      <div>
+        <span class="field-label block mb-1.5">Hero Background Image</span>
+        <div class="flex items-start gap-4">
+          <div class="w-32 h-20 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 bg-gray-100">
+            <img id="hero-bg-preview" src={s.hero_bg_image} alt="Hero background" class="w-full h-full object-cover" onerror="this.src='/images/entrance.svg'" />
+          </div>
+          <div class="flex-1">
+            <input type="hidden" data-key="hero_bg_image" id="hero-bg-value" value={s.hero_bg_image} />
+            <input type="file" id="hero-bg-file" accept="image/*" class="hidden" />
+            <button type="button" id="hero-bg-btn" class="btn-secondary text-sm">Upload New Image</button>
+            <p class="text-xs text-gray-400 mt-1.5">Current: <code class="bg-gray-100 px-1 rounded text-xs" id="hero-bg-path">{s.hero_bg_image}</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Color -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+    <h2 class="font-bold text-gray-900 mb-5 flex items-center gap-2"><span class="ms" style="color:var(--brand)">palette</span> Theme Color</h2>
+    <div class="flex flex-col sm:flex-row gap-6">
+      <label class="block flex-1">
+        <span class="field-label">Primary Color</span>
+        <div class="flex items-center gap-3 mt-1.5">
+          <input type="color" id="color-picker" value={s.brand_color} class="w-12 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5" />
+          <input type="text" data-key="brand_color" id="color-hex" value={s.brand_color} class="field-input font-mono flex-1" placeholder="#e91e8c" />
+        </div>
+      </label>
+      <label class="block flex-1">
+        <span class="field-label">Hover / Dark Shade</span>
+        <div class="flex items-center gap-3 mt-1.5">
+          <input type="color" id="color-dark-picker" value={s.brand_color_dark} class="w-12 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5" />
+          <input type="text" data-key="brand_color_dark" id="color-dark-hex" value={s.brand_color_dark} class="field-input font-mono flex-1" placeholder="#c4156f" />
+        </div>
+      </label>
+    </div>
+    <div class="mt-4 flex items-center gap-3">
+      <span class="text-sm text-gray-500">Preview:</span>
+      <button id="color-preview-btn" class="px-4 py-2 rounded-full text-white text-sm font-semibold transition-all" style={`background:${s.brand_color}`}>Book Now</button>
+    </div>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+    <h2 class="font-bold text-gray-900 mb-5 flex items-center gap-2"><span class="ms" style="color:var(--brand)">call</span> Contact Info</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="field-label">Phone Number</span>
+        <input type="text" data-key="phone" value={s.phone} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Open Hours</span>
+        <input type="text" data-key="open_hours" value={s.open_hours} class="field-input" />
+      </label>
+      <label class="block sm:col-span-2">
+        <span class="field-label">Address</span>
+        <input type="text" data-key="address" value={s.address} class="field-input" />
+      </label>
+      <label class="block sm:col-span-2">
+        <span class="field-label">Facebook URL</span>
+        <input type="url" data-key="facebook_url" value={s.facebook_url} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Google Maps Link</span>
+        <input type="url" data-key="maps_url" value={s.maps_url} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Maps Embed URL</span>
+        <input type="url" data-key="maps_embed_url" value={s.maps_embed_url} class="field-input" />
+      </label>
+    </div>
+  </div>
+
+  <!-- SEO / Meta -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+    <h2 class="font-bold text-gray-900 mb-5 flex items-center gap-2"><span class="ms" style="color:var(--brand)">manage_search</span> SEO / Page Meta</h2>
+    <div class="space-y-4">
+      <label class="block">
+        <span class="field-label">Site Title</span>
+        <input type="text" data-key="site_title" value={s.site_title} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Meta Description</span>
+        <textarea data-key="site_description" rows="2" class="field-input">{s.site_description}</textarea>
+      </label>
+    </div>
+  </div>
+
+  <!-- Section Copy -->
+  <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+    <h2 class="font-bold text-gray-900 mb-5 flex items-center gap-2"><span class="ms" style="color:var(--brand)">edit_note</span> Section Copy</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="field-label">Rooms Heading</span>
+        <input type="text" data-key="rooms_heading" value={s.rooms_heading} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Rooms Subtext</span>
+        <input type="text" data-key="rooms_subtext" value={s.rooms_subtext} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Amenities Heading</span>
+        <input type="text" data-key="amenities_heading" value={s.amenities_heading} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">Amenities Subtext</span>
+        <input type="text" data-key="amenities_subtext" value={s.amenities_subtext} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">CTA Heading</span>
+        <input type="text" data-key="cta_heading" value={s.cta_heading} class="field-input" />
+      </label>
+      <label class="block">
+        <span class="field-label">CTA Subtext</span>
+        <input type="text" data-key="cta_subtext" value={s.cta_subtext} class="field-input" />
+      </label>
+    </div>
+  </div>
+
+  <!-- Save button -->
+  <div class="flex justify-end">
+    <button id="save-btn" class="btn-primary w-full sm:w-auto px-8 py-3 text-base">Save All Changes</button>
+  </div>
+</AdminLayout>
+
+<style>
+  .field-label { font-size: 0.8125rem; font-weight: 600; color: #4b5563; display: block; margin-bottom: 0.375rem; }
+  .field-input {
+    width: 100%; padding: 0.625rem 0.875rem; border: 1.5px solid #e5e7eb;
+    border-radius: 0.625rem; font-size: 0.875rem; font-family: inherit;
+    outline: none; transition: border-color 0.15s; background: #f9fafb; color: #111827;
+    display: block;
+  }
+  .field-input:focus { border-color: var(--brand); background: white; }
+  textarea.field-input { resize: vertical; }
+  .btn-primary {
+    background: var(--brand); color: white; font-weight: 700; border: none;
+    border-radius: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.875rem;
+    padding: 0.625rem 1.25rem; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-secondary {
+    background: #f3f4f6; color: #374151; font-weight: 600; border: 1.5px solid #e5e7eb;
+    border-radius: 0.625rem; cursor: pointer; font-family: inherit; font-size: 0.8125rem;
+    padding: 0.5rem 1rem; transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--brand); color: var(--brand); }
+</style>
+
+<script>
+  // Color picker sync
+  const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
+  const colorHex = document.getElementById('color-hex') as HTMLInputElement;
+  const colorDarkPicker = document.getElementById('color-dark-picker') as HTMLInputElement;
+  const colorDarkHex = document.getElementById('color-dark-hex') as HTMLInputElement;
+  const previewBtn = document.getElementById('color-preview-btn') as HTMLButtonElement;
+
+  colorPicker.addEventListener('input', () => {
+    colorHex.value = colorPicker.value;
+    previewBtn.style.background = colorPicker.value;
+  });
+  colorHex.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(colorHex.value)) {
+      colorPicker.value = colorHex.value;
+      previewBtn.style.background = colorHex.value;
+    }
+  });
+  colorDarkPicker.addEventListener('input', () => { colorDarkHex.value = colorDarkPicker.value; });
+  colorDarkHex.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(colorDarkHex.value)) colorDarkPicker.value = colorDarkHex.value;
+  });
+
+  // Hero BG upload
+  const heroBgBtn = document.getElementById('hero-bg-btn') as HTMLButtonElement;
+  const heroBgFile = document.getElementById('hero-bg-file') as HTMLInputElement;
+  const heroBgValue = document.getElementById('hero-bg-value') as HTMLInputElement;
+  const heroBgPreview = document.getElementById('hero-bg-preview') as HTMLImageElement;
+  const heroBgPath = document.getElementById('hero-bg-path')!;
+
+  heroBgBtn.addEventListener('click', () => heroBgFile.click());
+  heroBgFile.addEventListener('change', async () => {
+    const file = heroBgFile.files?.[0];
+    if (!file) return;
+    heroBgBtn.textContent = 'Uploading…';
+    heroBgBtn.disabled = true;
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('alt', 'Hero background');
+    fd.append('caption', 'Hero');
+
+    const res = await fetch('/api/admin/gallery', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.src) {
+      heroBgValue.value = data.src;
+      heroBgPreview.src = data.src;
+      heroBgPath.textContent = data.src;
+    }
+    heroBgBtn.textContent = 'Upload New Image';
+    heroBgBtn.disabled = false;
+  });
+
+  // Save
+  const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+  const saveStatus = document.getElementById('save-status')!;
+  let saveTimer: ReturnType<typeof setTimeout>;
+
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.textContent = 'Saving…';
+    saveBtn.disabled = true;
+
+    const payload: Record<string, string> = {};
+    document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-key]').forEach(el => {
+      payload[el.dataset.key!] = el.value;
+    });
+
+    const res = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      saveStatus.classList.remove('hidden');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveStatus.classList.add('hidden'), 3000);
+    }
+    saveBtn.textContent = 'Save All Changes';
+    saveBtn.disabled = false;
+  });
+</script>

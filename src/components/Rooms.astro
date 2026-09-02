@@ -1,0 +1,78 @@
+---
+import type { Room } from '../lib/db';
+
+interface Props {
+  rooms: Room[];
+  heading?: string;
+  subtext?: string;
+  phone?: string;
+}
+
+const {
+  rooms,
+  heading = 'Comfortable Rooms for Every Guest',
+  subtext = "Whether you're passing through or staying for weeks, we have a space that fits your needs and budget.",
+  phone = '0919-782-6430',
+} = Astro.props;
+
+const telHref = `tel:+63${phone.replace(/^0/, '').replace(/-/g, '')}`;
+---
+
+<section id="rooms" class="py-20 bg-gray-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <span class="font-semibold text-sm uppercase tracking-widest" style="color:var(--brand)">Our Rooms</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">{heading}</h2>
+      <p class="text-gray-500 mt-3 max-w-xl mx-auto">{subtext}</p>
+      <div class="w-16 h-1 rounded-full mx-auto mt-5" style="background:var(--brand)"></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+      {rooms.map(room => (
+        <div class="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-shadow group">
+          <div class="relative h-52 overflow-hidden">
+            <img
+              src={room.image}
+              alt={room.name}
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              width="400"
+              height="208"
+              onerror={`this.onerror=null;this.src=this.src.replace('.jpg','.svg');`}
+            />
+            {room.badge && (
+              <div class="absolute top-3 right-3 text-white text-xs font-bold px-3 py-1 rounded-full shadow" style="background:var(--brand)">
+                {room.badge}
+              </div>
+            )}
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">{room.name}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-4">{room.description}</p>
+            <ul class="space-y-2">
+              {(room.features ?? []).map(feature => (
+                <li class="flex items-center gap-2 text-sm text-gray-600">
+                  <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--brand) 12%, transparent)">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" style="color:var(--brand)">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <a href={telHref} class="mt-6 block w-full text-center text-white font-semibold py-3 rounded-2xl transition-colors text-sm" style="background:var(--brand)">
+              Inquire / Book
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <p class="text-center text-gray-400 text-sm mt-10">
+      <span class="ms align-middle" style="font-size:1rem;color:var(--brand)">call</span>
+      Contact us directly for rates and availability:
+      <a href={telHref} class="font-semibold hover:underline" style="color:var(--brand)">{phone}</a>
+    </p>
+  </div>
+</section>

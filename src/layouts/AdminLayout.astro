@@ -1,0 +1,149 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  active?: string;
+}
+
+const { title = 'Admin', active = '' } = Astro.props;
+
+const nav = [
+  { href: '/admin', label: 'Dashboard', icon: 'home' },
+  { href: '/admin/settings', label: 'Settings', icon: 'settings' },
+  { href: '/admin/gallery', label: 'Gallery', icon: 'photo_library' },
+  { href: '/admin/rooms', label: 'Rooms', icon: 'bed' },
+  { href: '/admin/amenities', label: 'Amenities', icon: 'auto_awesome' },
+];
+
+// Merged font URL — pinned axis range, non-blocking
+const fontsUrl =
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&display=swap';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Admin pages must not be indexed -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.ico" />
+
+    <!-- Fonts: preconnect + non-blocking load -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href={fontsUrl} />
+    <link rel="stylesheet" href={fontsUrl} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={fontsUrl} /></noscript>
+
+    <title>{title} · 559 Admin</title>
+    <style>
+      :root { --brand: #e91e8c; --brand-dark: #c4156f; }
+      .ms { font-family: 'Material Symbols Rounded'; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-800 antialiased min-h-screen">
+
+    <!-- Sidebar (desktop) -->
+    <aside class="fixed top-0 left-0 h-full w-56 bg-gray-900 text-white flex flex-col z-40 hidden md:flex">
+      <!-- Logo -->
+      <div class="p-5 border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--brand)">
+            <span class="text-white font-black text-sm">559</span>
+          </div>
+          <div>
+            <p class="font-bold text-sm">559 Apartelle</p>
+            <p class="text-gray-400 text-xs">Admin Panel</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <nav class="flex-1 py-4 px-3 space-y-1">
+        {nav.map(item => (
+          <a
+            href={item.href}
+            class={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              active === item.label
+                ? 'text-white'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+            style={active === item.label ? 'background:var(--brand)' : ''}
+          >
+            <span class="ms text-[18px]">{item.icon}</span>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Footer links -->
+      <div class="p-4 border-t border-white/10 space-y-2">
+        <a href="/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-gray-400 hover:text-white text-xs transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          View Website
+        </a>
+        <a href="/admin/password" class="flex items-center gap-2 text-gray-400 hover:text-white text-xs transition-colors">
+          <span class="ms text-sm">key</span>
+          Change Password
+        </a>
+        <form method="POST" action="/api/admin/logout" id="logout-form">
+          <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-red-400 text-xs transition-colors w-full">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Mobile top bar -->
+    <div class="md:hidden fixed top-0 left-0 right-0 z-40 bg-gray-900 text-white px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background:var(--brand)">
+          <span class="text-white font-black text-xs">559</span>
+        </div>
+        <span class="font-bold text-sm">Admin</span>
+      </div>
+      <button id="mob-nav-btn" class="text-white p-1" aria-label="Toggle navigation">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile dropdown nav -->
+    <div id="mob-nav" class="md:hidden hidden fixed top-14 left-0 right-0 bg-gray-900 z-30 border-t border-white/10 px-4 py-3 space-y-1">
+      {nav.map(item => (
+        <a href={item.href} class="flex items-center gap-3 text-gray-300 hover:text-white py-2 text-sm font-medium">
+          <span class="ms text-[18px]">{item.icon}</span>{item.label}
+        </a>
+      ))}
+      <a href="/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-gray-400 text-sm py-2">View Website ↗</a>
+    </div>
+
+    <!-- Main content -->
+    <main class="md:ml-56 pt-14 md:pt-0 min-h-screen">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        <slot />
+      </div>
+    </main>
+
+    <script>
+      const btn = document.getElementById('mob-nav-btn');
+      const nav = document.getElementById('mob-nav');
+      btn?.addEventListener('click', () => nav?.classList.toggle('hidden'));
+
+      // Handle logout via fetch to avoid full page reload issues
+      document.getElementById('logout-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await fetch('/api/admin/logout', { method: 'POST' });
+        window.location.href = '/admin/login';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#f59f0b"/>
+  <rect x="0" y="0" width="1200" height="800" fill="url(#sky)"/>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="60%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <!-- Wall -->
+  <rect x="100" y="300" width="1000" height="400" rx="8" fill="#f59e0b"/>
+  <!-- Sign board -->
+  <rect x="480" y="150" width="240" height="160" rx="8" fill="#166534"/>
+  <circle cx="600" cy="215" r="55" fill="none" stroke="#fbbf24" stroke-width="4"/>
+  <text x="600" y="225" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="32" fill="white">559</text>
+  <text x="600" y="260" text-anchor="middle" font-family="Arial" font-size="14" fill="#fbbf24">APARTELLE</text>
+  <!-- Ground -->
+  <rect x="0" y="680" width="1200" height="120" fill="#d1d5db"/>
+  <text x="600" y="760" text-anchor="middle" font-family="Arial" font-size="20" fill="#6b7280">Entrance · 559 Apartelle</text>
+</svg>

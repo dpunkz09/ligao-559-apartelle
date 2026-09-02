@@ -1,0 +1,75 @@
+---
+import type { Amenity } from '../lib/db';
+
+interface Props {
+  amenities: Amenity[];
+  heading?: string;
+  subtext?: string;
+  ctaHeading?: string;
+  ctaSubtext?: string;
+  phone?: string;
+  facebookUrl?: string;
+}
+
+const {
+  amenities,
+  heading = 'Amenities & Features',
+  subtext = 'Everything you need for a pleasant, stress-free stay — all included.',
+  ctaHeading = 'Ready to Book Your Stay?',
+  ctaSubtext = "Call us now and we'll get your room ready.",
+  phone = '0919-782-6430',
+  facebookUrl = 'https://www.facebook.com/profile.php?id=100057213410203',
+} = Astro.props;
+
+const telHref = `tel:+63${phone.replace(/^0/, '').replace(/-/g, '')}`;
+---
+
+<section id="amenities" class="py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <span class="font-semibold text-sm uppercase tracking-widest" style="color:var(--brand)">What We Offer</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">{heading}</h2>
+      <p class="text-gray-500 mt-3 max-w-xl mx-auto">{subtext}</p>
+      <div class="w-16 h-1 rounded-full mx-auto mt-5" style="background:var(--brand)"></div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5">
+      {amenities.map(item => (
+        <div class="amenity-card group bg-gray-50 rounded-2xl p-6 text-center transition-all duration-300 cursor-default border border-gray-100 hover:shadow-lg" style="">
+          <span class="ms text-4xl mb-3 block" style="font-size:2rem">{item.icon}</span>
+          <h3 class="font-bold text-sm mb-2 text-gray-900 group-hover:text-white transition-colors">{item.title}</h3>
+          <p class="text-xs leading-relaxed text-gray-500 group-hover:text-white/80 transition-colors">{item.description}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA Strip -->
+    <div class="mt-14 rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-white shadow-xl" style="background:linear-gradient(to right, var(--brand), var(--brand-dark))">
+      <div>
+        <h3 class="text-2xl font-black">{ctaHeading}</h3>
+        <p class="text-white/80 mt-1 text-sm">{ctaSubtext}</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href={telHref} class="inline-flex items-center justify-center gap-2 bg-white font-bold px-6 py-3 rounded-full transition-colors shadow text-sm whitespace-nowrap" style="color:var(--brand)">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+          </svg>
+          {phone}
+        </a>
+        <a href={facebookUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-6 py-3 rounded-full transition-colors text-sm whitespace-nowrap">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Message on Facebook
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .amenity-card:hover {
+    background: var(--brand) !important;
+    border-color: var(--brand) !important;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+interface Props {
+  phone?: string;
+  address?: string;
+  facebookUrl?: string;
+  mapsUrl?: string;
+  mapsEmbedUrl?: string;
+  openHours?: string;
+}
+
+const {
+  phone = '0919-782-6430',
+  address = 'Brgy. Tomolin, Ligao City, Albay, Philippines',
+  facebookUrl = 'https://www.facebook.com/profile.php?id=100057213410203',
+  mapsUrl = 'https://maps.app.goo.gl/1mXPt78aRWwsdsex7',
+  mapsEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3879.3!2d123.4844!3d13.2178!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a19b2dfbf6c6c5%3A0x7c559ad35cb16f74!2s559%20Apartelle!5e0!3m2!1sen!2sph!4v1',
+  openHours = 'Open 24/7',
+} = Astro.props;
+
+const telHref = `tel:+63${phone.replace(/^0/, '').replace(/-/g, '')}`;
+---
+
+<section id="contact" class="py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <span class="font-semibold text-sm uppercase tracking-widest" style="color:var(--brand)">Get in Touch</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">Find Us & Contact Us</h2>
+      <p class="text-gray-500 mt-3 max-w-xl mx-auto">We're easy to find along the main road in Tomolin. Give us a call and we'll be ready for you.</p>
+      <div class="w-16 h-1 rounded-full mx-auto mt-5" style="background:var(--brand)"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10 items-start">
+      <div class="space-y-6">
+        <!-- Address -->
+        <div class="flex items-start gap-4 bg-gray-50 rounded-2xl p-5 border border-gray-100">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--brand) 12%, transparent)">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style="color:var(--brand)">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">Address</p>
+            <p class="text-gray-500 text-sm mt-0.5 leading-relaxed">{address}</p>
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs font-semibold mt-2 hover:underline" style="color:var(--brand)">
+              View on Google Maps →
+            </a>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="flex items-start gap-4 bg-gray-50 rounded-2xl p-5 border border-gray-100">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--brand) 12%, transparent)">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style="color:var(--brand)">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">Phone / CP</p>
+            <a href={telHref} class="font-semibold text-lg hover:underline mt-0.5 block" style="color:var(--brand)">{phone}</a>
+            <p class="text-gray-400 text-xs mt-1">Available for calls and SMS</p>
+          </div>
+        </div>
+
+        <!-- Facebook -->
+        <div class="flex items-start gap-4 bg-gray-50 rounded-2xl p-5 border border-gray-100">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--brand) 12%, transparent)">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style="color:var(--brand)">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">Facebook Page</p>
+            <a href={facebookUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-semibold hover:underline mt-0.5 block" style="color:var(--brand)">
+              559 Apartelle on Facebook →
+            </a>
+            <p class="text-gray-400 text-xs mt-1">Send us a message anytime</p>
+          </div>
+        </div>
+
+        <!-- Hours -->
+        <div class="flex items-start gap-4 rounded-2xl p-5 border" style="background:color-mix(in srgb, var(--brand) 5%, transparent); border-color:color-mix(in srgb, var(--brand) 20%, transparent)">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--brand) 12%, transparent)">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style="color:var(--brand)">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-bold text-gray-800">Open Hours</p>
+            <p class="text-gray-600 text-sm mt-0.5">{openHours}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="rounded-3xl overflow-hidden shadow-xl border border-gray-100 h-[380px] md:h-full md:min-h-[480px]">
+        <iframe
+          src={mapsEmbedUrl}
+          width="100%"
+          height="100%"
+          style="border:0; display:block; height:100%; min-height:380px;"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="559 Apartelle on Google Maps"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>
