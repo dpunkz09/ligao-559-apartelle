@@ -9,7 +9,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         HOST: '0.0.0.0',
-        PORT: 559,
+        PORT: 5590,
         // Set COOKIE_SECURE=true only when serving over HTTPS (e.g. behind Nginx with SSL).
         // Leave as 'false' when serving over plain HTTP — otherwise the login cookie
         // will be silently dropped by the browser and you won't be able to log in.
