@@ -71,7 +71,7 @@ function seed(db: Database.Database) {
   const settingsCount = (db.prepare('SELECT COUNT(*) as c FROM settings').get() as { c: number }).c;
   if (settingsCount === 0) {
     const defaults: Record<string, string> = {
-      site_title: 'Ligao 559 Apartelle – Tomolin, Ligao City, Albay',
+      site_title: 'Ligao 559 Apartelle – Nice & Relax',
       site_description: 'Affordable, comfortable lodging with private garages in Brgy. Tomolin, Ligao City, Albay. Book your stay at 559 Apartelle today. Call 0919-782-6430.',
       hero_badge: 'Now Accepting Guests · Ligao City, Albay',
       hero_headline: 'Nice & Relax',
